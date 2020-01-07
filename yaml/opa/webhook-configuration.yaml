@@ -1,0 +1,22 @@
+kind: ValidatingWebhookConfiguration
+apiVersion: admissionregistration.k8s.io/v1beta1
+metadata:
+  name: opa-validating-webhook
+webhooks:
+  - name: validating-webhook.openpolicyagent.org
+    namespaceSelector:
+      matchExpressions:
+      - key: openpolicyagent.org/webhook
+        operator: NotIn
+        values:
+        - ignore
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["*"]
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNyRENDQVpRQ0NRRER5U1ZEYzRpTEh6QU5CZ2txaGtpRzl3MEJBUXNGQURBWE1SVXdFd1lEVlFRRERBeGgKWkcxcGMzTnBiMjVmWTJFd0lCY05NVGt3TmpJd01UWTFOalE0V2hnUE1qSTVNekEwTURReE5qVTJORGhhTUJjeApGVEFUQmdOVkJBTU1ER0ZrYldsemMybHZibDlqWVRDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDCkFRb0NnZ0VCQUx3R1Boc013elVxdlBHZDc0WVdBSzFFWlpOWGVsUTZCWnFZYStPNHREWENhL0FWb1JTMmw4Z0YKM1BLYXJZUW5RY2drTS93cThXMVhRSEtmZEdzLzFFN2g0MWhDdE9pNXdlcmpVNHRVUXE0bFpld1B0ei9nWG4yNQp1dDN0aDJpVGlTQXRnc2FlVWlodkY5Q21VTFdxY3pzaTJKT2E1K3cwTnFaa1FIemY1VHJBVDZrT010bEVvcWw4CllpTVdRSG9nMjUzSjZYc2FsUFRJZlJSTFBaSERXRytNY285T3ZRZXFiaGFYdkpGYWJVdUlZRkpvUitUNnNGNjkKQXBTM1Nna2hJc3BVV0ZsSkpsOSt4VnRJK1JkVEc3UlNQNkROTmpvZjBHWnA0VkRMRGlnWEg4Rm00RnBrM3UycgpLZ0dLZDN2cDJsODNkOHNIZ1ZGamZUWWdINVBZQko4Q0F3RUFBVEFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBCmdWTkpVaVFJenVqOVpac2RycnQwOUIxdnh0NVpjbkp4RW9ITHBmTTgrbzBiaEtRYnQ4S3JiL3NBd2ZWUE9ZclQKQ2c2Wmp0ZTJRdFFzTS9vUWlZVG1TQUljYnJVVlNEWUVlY3l3Tk5KdFZmS3hkQVUvYW5WVlB5WG1oZU5YUkI0WgpPS2o1M3FhT20wZ3FycHdnKzI5djVmcDQrOUUvSTNrRStwTlR0Rjd0ZmFxbHRQWDRva0NKVCtiRmU3UTJ3dktJCnVYVEJRV21LOHN1SGVqQmt1WkR4NEg2b0pMcnJQM3ZqbS9wbEFxSnd2OXA0eVBGbUtyTzlHNTl1MDk0dWdhSVUKenIydjJnWlhDRXNsRGhPMGFkcGREc2g3enZZN3BMUktIZHhPNndOMmhvcHpWV3ZhU2RoZVZnTXNWamx5eUNaYgpUWkNPaCs4UXJ4NFo1aEdzejViWGt3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      service:
+        namespace: opa
+        name: opa
