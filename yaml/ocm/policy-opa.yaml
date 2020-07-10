@@ -1,0 +1,69 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-opa
+  annotations:
+    policy.open-cluster-management.io/standards: NIST-CSF
+    policy.open-cluster-management.io/categories: CIS
+    policy.open-cluster-management.io/controls: opa
+spec:
+  remediationAction: enforce
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-opa-no-pod
+        spec:
+          remediationAction: enforce # will be overridden by remediationAction in parent policy
+          severity: high
+          namespaces:
+            exclude:
+            - kube*
+            include:
+            - opa
+          object-templates:
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: no-pod
+                namespace: opa
+              data:
+                no_pod.rego: |-
+                  package kubernetes.admission
+                  deny[msg] {
+                      input.request.kind.kind == "Pod"
+                      input.request.namespace == "opa"
+                      image := input.request.object.spec.containers[_].image
+                      not startswith(image, "hooli.com")
+                      msg := sprintf("image fails to come from trusted registry: %v", [image])
+                  }
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-opa
+placementRef:
+  name: placement-opa
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: policy-opa
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-opa
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+      []  # selects all clusters if not specified
