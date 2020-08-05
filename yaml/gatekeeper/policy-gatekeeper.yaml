@@ -41,7 +41,6 @@ spec:
                     - target: admission.k8s.gatekeeper.sh
                       rego: |
                         package k8srequiredlabels
-                
                         violation[{"msg": msg, "details": {"missing_labels": missing}}] {
                           provided := {label | input.review.object.metadata.labels[label]}
                           required := {label | label := input.parameters.labels[_]}
@@ -49,15 +48,6 @@ spec:
                           count(missing) > 0
                           msg := sprintf("you must provide labels: %v", [missing])
                         }
-    - objectDefinition:
-        apiVersion: policy.open-cluster-management.io/v1
-        kind: ConfigurationPolicy
-        metadata:
-          name: policy-gatekeeper-ns-must-have-gk
-        spec:
-          remediationAction: enforce # will be overridden by remediationAction in parent policy
-          severity: low
-          object-templates:
             - complianceType: musthave
               objectDefinition:
                 apiVersion: constraints.gatekeeper.sh/v1beta1
@@ -75,7 +65,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-gatekeeper-no-violations
+          name: policy-gatekeeper-audit
         spec:
           remediationAction: inform # will be overridden by remediationAction in parent policy
           severity: low
@@ -89,6 +79,26 @@ spec:
                 status:
                   totalViolations: 0
                   violations: []
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-gatekeeper-admission
+        spec:
+          remediationAction: inform # will be overridden by remediationAction in parent policy
+          severity: low
+          object-templates:
+            - complianceType: mustnothave
+              objectDefinition:
+                apiVersion: v1
+                kind: Event
+                metadata:
+                  namespace: gatekeeper-system
+                  annotations:
+                    constraint_action: deny
+                    constraint_kind: K8sRequiredLabels
+                    constraint_name: ns-must-have-gk
+                    event_type: violation
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
