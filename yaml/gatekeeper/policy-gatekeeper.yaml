@@ -59,6 +59,9 @@ spec:
                     kinds:
                       - apiGroups: [""]
                         kinds: ["Namespace"]
+                    namespaces:
+                      - test
+                      - twitch
                   parameters:
                     labels: ["gatekeeper"]
     - objectDefinition:
@@ -78,7 +81,6 @@ spec:
                   name: ns-must-have-gk
                 status:
                   totalViolations: 0
-                  violations: []
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
