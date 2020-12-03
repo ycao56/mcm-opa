@@ -1,7 +1,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: policy-gatekeeper
+  name: policy-gatekeeper-ns
   namespace: default
   annotations:
     policy.open-cluster-management.io/standards: 
@@ -14,7 +14,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-gatekeeper-k8srequiredlabels
+          name: policy-gatekeeper-ns-k8srequiredlabels
         spec:
           remediationAction: enforce # will be overridden by remediationAction in parent policy
           severity: low
@@ -68,7 +68,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-gatekeeper-audit
+          name: policy-gatekeeper-ns-audit
         spec:
           remediationAction: inform # will be overridden by remediationAction in parent policy
           severity: low
@@ -85,7 +85,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: policy-gatekeeper-admission
+          name: policy-gatekeeper-ns-admission
         spec:
           remediationAction: inform # will be overridden by remediationAction in parent policy
           severity: low
@@ -105,21 +105,21 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: binding-policy-gatekeeper
+  name: binding-policy-gatekeeper-ns
   namespace: default
 placementRef:
-  name: placement-policy-gatekeeper
+  name: placement-policy-gatekeeper-ns
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: policy-gatekeeper
+- name: policy-gatekeeper-ns
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: placement-policy-gatekeeper
+  name: placement-policy-gatekeeper-ns
   namespace: default
 spec:
   clusterConditions:
